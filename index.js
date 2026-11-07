@@ -273,21 +273,19 @@ app.post('/', async (req, res) => {
     });
 
     const mailOptions = {
-      from: email,
+      from: process.env.EMAIL_USER,
+      replyTo: email,
       to: `${process.env.EMAIL_USER}`,
       subject: subject,
       html: emailBody
     }
 
-    await transporter.sendMail(mailOptions, (err, info) => {
-      if (err) {
-        return res.json({ 'error': 'An error occurred' });
-      }
+    await transporter.sendMail(mailOptions);
 
-      return res.json({ 'message': 'Email sent successfully' });
-    });
+    return res.json({ 'message': 'Email sent successfully' });
   } catch (error) {
-    return res.json({ 'error': error.message });
+    console.error('Failed to send email:', error.message);
+    return res.status(500).json({ 'error': 'An error occurred while sending your message. Please try again or contact me directly.' });
   }
 });
 
